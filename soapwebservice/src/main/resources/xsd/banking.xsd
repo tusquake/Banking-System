@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://bank.com/banking"
+           targetNamespace="http://bank.com/banking"
+           elementFormDefault="qualified">
+
+    <!-- Enums -->
+    <xs:simpleType name="AccountType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SAVINGS"/>
+            <xs:enumeration value="CURRENT"/>
+            <xs:enumeration value="FIXED_DEPOSIT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AccountStatus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ACTIVE"/>
+            <xs:enumeration value="INACTIVE"/>
+            <xs:enumeration value="CLOSED"/>
+            <xs:enumeration value="BLOCKED"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TransactionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DEPOSIT"/>
+            <xs:enumeration value="WITHDRAWAL"/>
+            <xs:enumeration value="TRANSFER_IN"/>
+            <xs:enumeration value="TRANSFER_OUT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Account -->
+    <xs:complexType name="Account">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="accountNumber" type="xs:string"/>
+            <xs:element name="accountHolderName" type="xs:string"/>
+            <xs:element name="accountType" type="tns:AccountType"/>
+            <xs:element name="balance" type="xs:decimal"/>
+            <xs:element name="status" type="tns:AccountStatus"/>
+            <xs:element name="createdDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Transaction -->
+    <xs:complexType name="Transaction">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="transactionId" type="xs:string"/>
+            <xs:element name="accountNumber" type="xs:string"/>
+            <xs:element name="transactionType" type="tns:TransactionType"/>
+            <xs:element name="amount" type="xs:decimal"/>
+            <xs:element name="balanceAfter" type="xs:decimal"/>
+            <xs:element name="timestamp" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Requests and Responses -->
+    <xs:complexType name="CreateAccountRequest">
+        <xs:sequence>
+            <xs:element name="accountHolderName" type="xs:string"/>
+            <xs:element name="accountType" type="tns:AccountType"/>
+            <xs:element name="initialBalance" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CreateAccountResponse">
+        <xs:sequence>
+            <xs:element name="account" type="tns:Account"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GetAccountRequest">
+        <xs:sequence>
+            <xs:element name="accountNumber" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GetAccountResponse">
+        <xs:sequence>
+            <xs:element name="account" type="tns:Account"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DepositRequest">
+        <xs:sequence>
+            <xs:element name="accountNumber" type="xs:string"/>
+            <xs:element name="amount" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DepositResponse">
+        <xs:sequence>
+            <xs:element name="transaction" type="tns:Transaction"/>
+            <xs:element name="newBalance" type="xs:decimal"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="WithdrawRequest">
+        <xs:sequence>
+            <xs:element name="accountNumber" type="xs:string"/>
+            <xs:element name="amount" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="WithdrawResponse">
+        <xs:sequence>
+            <xs:element name="transaction" type="tns:Transaction"/>
+            <xs:element name="newBalance" type="xs:decimal"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TransferRequest">
+        <xs:sequence>
+            <xs:element name="fromAccountNumber" type="xs:string"/>
+            <xs:element name="toAccountNumber" type="xs:string"/>
+            <xs:element name="amount" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ✅ Fixed TransferResponse -->
+    <xs:complexType name="TransferResponse">
+        <xs:sequence>
+            <xs:element name="fromTransaction" type="tns:Transaction"/>
+            <xs:element name="toTransaction" type="tns:Transaction"/>
+            <xs:element name="fromAccountBalance" type="xs:decimal"/>
+            <xs:element name="toAccountBalance" type="xs:decimal"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ✅ Added TransactionHistory -->
+    <xs:complexType name="GetTransactionHistoryRequest">
+        <xs:sequence>
+            <xs:element name="accountNumber" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GetTransactionHistoryResponse">
+        <xs:sequence>
+            <xs:element name="transactions" type="tns:Transaction" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Elements -->
+    <xs:element name="createAccountRequest" type="tns:CreateAccountRequest"/>
+    <xs:element name="createAccountResponse" type="tns:CreateAccountResponse"/>
+    <xs:element name="getAccountRequest" type="tns:GetAccountRequest"/>
+    <xs:element name="getAccountResponse" type="tns:GetAccountResponse"/>
+    <xs:element name="depositRequest" type="tns:DepositRequest"/>
+    <xs:element name="depositResponse" type="tns:DepositResponse"/>
+    <xs:element name="withdrawRequest" type="tns:WithdrawRequest"/>
+    <xs:element name="withdrawResponse" type="tns:WithdrawResponse"/>
+    <xs:element name="transferRequest" type="tns:TransferRequest"/>
+    <xs:element name="transferResponse" type="tns:TransferResponse"/>
+    <xs:element name="getTransactionHistoryRequest" type="tns:GetTransactionHistoryRequest"/>
+    <xs:element name="getTransactionHistoryResponse" type="tns:GetTransactionHistoryResponse"/>
+
+</xs:schema>
